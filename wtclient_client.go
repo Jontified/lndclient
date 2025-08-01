@@ -31,22 +31,22 @@ type WtClientClient interface {
 }
 
 type PolicyResponse struct {
-	maxUpdates uint32
+	maxUpdates       uint32
 	sweepSatPerVbyte uint32
 }
 
 type StatsResponse struct {
-	numBackups uint32
-	numPendingBackups uint32
-	numFailedBackups uint32
-	numSessionsAcquired uint32
+	numBackups           uint32
+	numPendingBackups    uint32
+	numFailedBackups     uint32
+	numSessionsAcquired  uint32
 	numSessionsExhausted uint32
 }
 
 type wtClientClient struct {
-	client       wtclientrpc.WatchtowerClientClient
-	wtClientMac  serializedMacaroon
-	timeout      time.Duration
+	client      wtclientrpc.WatchtowerClientClient
+	wtClientMac serializedMacaroon
+	timeout     time.Duration
 }
 
 // A compile time check to ensure that  wtClientClient implements the
@@ -77,7 +77,7 @@ func (m *wtClientClient) AddTower(ctx context.Context, pubkey []byte, address st
 	defer cancel()
 
 	rpcReq := &wtclientrpc.AddTowerRequest{
-		Pubkey: pubkey,
+		Pubkey:  pubkey,
 		Address: address,
 	}
 
@@ -106,14 +106,14 @@ func (m *wtClientClient) DeactivateTower(ctx context.Context, pubkey []byte) (st
 }
 
 func (m *wtClientClient) GetTowerInfo(ctx context.Context, pubkey []byte, includeSessions,
-		excludeExhaustedSessions bool) (*wtclientrpc.Tower, error) {
+	excludeExhaustedSessions bool) (*wtclientrpc.Tower, error) {
 	rpcCtx, cancel := context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
 	rpcCtx = m.wtClientMac.WithMacaroonAuth(rpcCtx)
 	resp, err := m.client.GetTowerInfo(rpcCtx, &wtclientrpc.GetTowerInfoRequest{
-		Pubkey: pubkey,
-		IncludeSessions: includeSessions,
+		Pubkey:                   pubkey,
+		IncludeSessions:          includeSessions,
 		ExcludeExhaustedSessions: excludeExhaustedSessions,
 	})
 	if err != nil {
@@ -124,13 +124,13 @@ func (m *wtClientClient) GetTowerInfo(ctx context.Context, pubkey []byte, includ
 }
 
 func (m *wtClientClient) ListTowers(ctx context.Context, includeSessions,
-		excludeExhaustedSessions bool) ([]*wtclientrpc.Tower, error) {
+	excludeExhaustedSessions bool) ([]*wtclientrpc.Tower, error) {
 	rpcCtx, cancel := context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
 	rpcCtx = m.wtClientMac.WithMacaroonAuth(rpcCtx)
 	resp, err := m.client.ListTowers(rpcCtx, &wtclientrpc.ListTowersRequest{
-		IncludeSessions: includeSessions,
+		IncludeSessions:          includeSessions,
 		ExcludeExhaustedSessions: excludeExhaustedSessions,
 	})
 	if err != nil {
@@ -153,7 +153,7 @@ func (m *wtClientClient) Policy(ctx context.Context, policyType wtclientrpc.Poli
 	}
 
 	return &PolicyResponse{
-		maxUpdates: resp.MaxUpdates,
+		maxUpdates:       resp.MaxUpdates,
 		sweepSatPerVbyte: resp.SweepSatPerVbyte,
 	}, nil
 }
@@ -163,7 +163,7 @@ func (m *wtClientClient) RemoveTower(ctx context.Context, pubkey []byte, address
 
 	rpcCtx = m.wtClientMac.WithMacaroonAuth(rpcCtx)
 	_, err := m.client.RemoveTower(rpcCtx, &wtclientrpc.RemoveTowerRequest{
-		Pubkey: pubkey,
+		Pubkey:  pubkey,
 		Address: address,
 	})
 	if err != nil {
@@ -184,10 +184,10 @@ func (m *wtClientClient) Stats(ctx context.Context) (*StatsResponse, error) {
 	}
 
 	return &StatsResponse{
-		numBackups: resp.NumBackups,
-		numPendingBackups: resp.NumPendingBackups,
-		numFailedBackups: resp.NumFailedBackups,
-		numSessionsAcquired: resp.NumSessionsAcquired,
+		numBackups:           resp.NumBackups,
+		numPendingBackups:    resp.NumPendingBackups,
+		numFailedBackups:     resp.NumFailedBackups,
+		numSessionsAcquired:  resp.NumSessionsAcquired,
 		numSessionsExhausted: resp.NumSessionsExhausted,
 	}, nil
 }
