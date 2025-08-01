@@ -21,6 +21,7 @@ var (
 		"signrpc":     (*SignerClient)(nil),
 		"verrpc":      (*VersionerClient)(nil),
 		"walletrpc":   (*WalletKitClient)(nil),
+		"wtclientrpc": (*WtClientClient)(nil),
 	}
 
 	// renames is a map of renamed RPC method names. The key is the name as

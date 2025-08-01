@@ -180,6 +180,7 @@ type LndServices struct {
 	Router        RouterClient
 	Versioner     VersionerClient
 	State         StateClient
+	WtClient      wtClientClient
 
 	ChainParams *chaincfg.Params
 	NodeAlias   string
