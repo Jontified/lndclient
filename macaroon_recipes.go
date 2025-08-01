@@ -21,7 +21,7 @@ var (
 		"signrpc":     (*SignerClient)(nil),
 		"verrpc":      (*VersionerClient)(nil),
 		"walletrpc":   (*WalletKitClient)(nil),
-		"wtclientrpc": (*WtClientClient)(nil),
+		"wtclientrpc": (*WatchtowerClientClient)(nil),
 	}
 
 	// renames is a map of renamed RPC method names. The key is the name as
@@ -55,6 +55,15 @@ var (
 	}
 )
 
+func replaceRight(s, old, new string) string {
+	i := strings.LastIndex(s, old)
+	if i == -1 {
+		return s
+	}
+
+	return s[:i] + new + s[i+len(old):]
+}
+
 // MacaroonRecipe returns a list of macaroon permissions that is required to use
 // the full feature set of the given list of RPC package names.
 func MacaroonRecipe(c LightningClient, packages []string) ([]MacaroonPermission,
@@ -78,7 +87,7 @@ func MacaroonRecipe(c LightningClient, packages []string) ([]MacaroonPermission,
 		// From the pointer type we can find out the interface, its name
 		// and what methods it declares.
 		ifaceType := reflect.TypeOf(ifacePtr).Elem()
-		serverName := strings.ReplaceAll(ifaceType.Name(), "Client", "")
+		serverName := replaceRight(ifaceType.Name(), "Client", "")
 		for i := range ifaceType.NumMethod() {
 			// The methods in lndclient might be called slightly
 			// differently. Rename according to our rename mapping

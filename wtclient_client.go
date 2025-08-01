@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type WtClientClient interface {
+type WatchtowerClientClient interface {
 	ServiceClient[wtclientrpc.WatchtowerClientClient]
 
 	AddTower(ctx context.Context, pubkey []byte, address string) error
@@ -51,7 +51,7 @@ type wtClientClient struct {
 
 // A compile time check to ensure that  wtClientClient implements the
 // WtclientClient interface.
-var _ WtClientClient = (*wtClientClient)(nil)
+var _ WatchtowerClientClient = (*wtClientClient)(nil)
 
 func newWtClientClient(conn grpc.ClientConnInterface,
 	wtClientMac serializedMacaroon, timeout time.Duration) *wtClientClient {
