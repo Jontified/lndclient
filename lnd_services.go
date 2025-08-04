@@ -180,7 +180,7 @@ type LndServices struct {
 	Router        RouterClient
 	Versioner     VersionerClient
 	State         StateClient
-	WtClient      wtClientClient
+	WtClient      WatchtowerClientClient
 
 	ChainParams *chaincfg.Params
 	NodeAlias   string
@@ -386,6 +386,9 @@ func NewLndServices(cfg *LndServicesConfig) (*GrpcLndServices, error) {
 	routerClient := newRouterClient(
 		conn, macaroons[RouterServiceMac], timeout,
 	)
+	wtClientClient := newWtClientClient(
+		conn, macaroons[WalletKitServiceMac], timeout,
+	)
 
 	cleanup := func() {
 		log.Debugf("Closing lnd connection")
@@ -417,6 +420,7 @@ func NewLndServices(cfg *LndServicesConfig) (*GrpcLndServices, error) {
 			Router:        routerClient,
 			Versioner:     versionerClient,
 			State:         stateClient,
+			WtClient:      wtClientClient,
 			ChainParams:   chainParams,
 			NodeAlias:     nodeAlias,
 			NodePubkey:    route.Vertex(nodeKey),

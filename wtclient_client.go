@@ -8,11 +8,15 @@ import (
 	"google.golang.org/grpc"
 )
 
+// Implementation of the watchtower client interface
+// https://lightning.engineering/api-docs/category/watchtowerclient-service/
 type WatchtowerClientClient interface {
 	ServiceClient[wtclientrpc.WatchtowerClientClient]
 
 	AddTower(ctx context.Context, pubkey []byte, address string) error
 
+	// Sets the given tower's status to inactive so that it's not considered
+	// for session negotiation. Returns a human readable status string.
 	DeactivateTower(ctx context.Context, pubkey []byte) (string, error)
 
 	GetTowerInfo(ctx context.Context, pubkey []byte, includeSessions,
@@ -27,14 +31,20 @@ type WatchtowerClientClient interface {
 
 	Stats(ctx context.Context) (*StatsResponse, error)
 
+	// Terminates the given session and marks it to not be used for backups
+	// anymore. Returns a human readable status string.
 	TerminateSession(ctx context.Context, sessionId []byte) (string, error)
 }
 
+// Response returned by `Policy`
+// https://lightning.engineering/api-docs/api/lnd/watchtower-client/policy/#wtclientrpcpolicyresponse
 type PolicyResponse struct {
 	maxUpdates       uint32
 	sweepSatPerVbyte uint32
 }
 
+// Response returned by `Stats`
+// https://lightning.engineering/api-docs/api/lnd/watchtower-client/stats/#wtclientrpcstatsresponse
 type StatsResponse struct {
 	numBackups           uint32
 	numPendingBackups    uint32
@@ -107,6 +117,7 @@ func (m *wtClientClient) DeactivateTower(ctx context.Context, pubkey []byte) (st
 
 func (m *wtClientClient) GetTowerInfo(ctx context.Context, pubkey []byte, includeSessions,
 	excludeExhaustedSessions bool) (*wtclientrpc.Tower, error) {
+
 	rpcCtx, cancel := context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
@@ -125,6 +136,7 @@ func (m *wtClientClient) GetTowerInfo(ctx context.Context, pubkey []byte, includ
 
 func (m *wtClientClient) ListTowers(ctx context.Context, includeSessions,
 	excludeExhaustedSessions bool) ([]*wtclientrpc.Tower, error) {
+
 	rpcCtx, cancel := context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
@@ -157,6 +169,7 @@ func (m *wtClientClient) Policy(ctx context.Context, policyType wtclientrpc.Poli
 		sweepSatPerVbyte: resp.SweepSatPerVbyte,
 	}, nil
 }
+
 func (m *wtClientClient) RemoveTower(ctx context.Context, pubkey []byte, address string) error {
 	rpcCtx, cancel := context.WithTimeout(ctx, m.timeout)
 	defer cancel()

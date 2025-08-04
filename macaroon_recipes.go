@@ -55,13 +55,13 @@ var (
 	}
 )
 
-func replaceRight(s, old, new string) string {
-	i := strings.LastIndex(s, old)
+func replaceRight(s, oldString, newString string) string {
+	i := strings.LastIndex(s, oldString)
 	if i == -1 {
 		return s
 	}
 
-	return s[:i] + new + s[i+len(old):]
+	return s[:i] + newString + s[i+len(oldString):]
 }
 
 // MacaroonRecipe returns a list of macaroon permissions that is required to use
